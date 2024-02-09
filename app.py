@@ -93,6 +93,22 @@ def data_chat():
             return render_template('data_chat.html', error_message=error_message)
 
 
+@app.route('/extract_resume_info', methods=['POST'])
+def extract_resume_info():
+    if 'resume_file' not in request.files:
+        return "No file part"
+
+    resume_file = request.files['resume_file']
+
+    if resume_file.filename == '':
+        return "No selected file"
+
+    if resume_file and resume_file.filename.endswith('.pdf'):
+        resume_info = extraction.parse_cv(resume_file)
+        return render_template('result.html', resume_info=resume_info)
+
+    return "Invalid file format. Please upload a PDF file."
+
 
 if __name__ == "__main__":
     app.run(debug=True)
