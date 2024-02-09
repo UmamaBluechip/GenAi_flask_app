@@ -19,15 +19,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import DocArrayInMemorySearch
 
 from utils import MEMORY, load_document
-#from config import set_environment
 
 logging.basicConfig(encoding="utf-8", level=logging.INFO)
 LOGGER = logging.getLogger()
-#set_environment()
 
 # Setup LLM and QA chain; set temperature low to keep hallucinations in check
 LLM = ChatVertexAI()
-
 
 def configure_retriever(
         docs: list[Document],
@@ -39,7 +36,6 @@ def configure_retriever(
     splits = text_splitter.split_documents(docs)
 
     # Create embeddings and store in vectordb:
-    #embeddings = OpenAIEmbeddings()
     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     # Create vectordb with single call to embedding model for texts:
     vectordb = DocArrayInMemorySearch.from_documents(splits, embeddings)

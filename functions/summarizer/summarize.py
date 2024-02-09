@@ -15,10 +15,8 @@ from langchain.chat_models import ChatOpenAI, ChatVertexAI
 from langchain.document_loaders import PyPDFLoader
 from langchain.schema import Document
 
-#from config import set_environment
 from summarize import prompts
 
-#set_environment()
 
 CHAT = ChatVertexAI(
     temperature=0.7,
