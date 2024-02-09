@@ -2,6 +2,7 @@
 from langchain import OpenAI, PromptTemplate
 from langchain.agents import create_pandas_dataframe_agent, AgentExecutor
 import pandas as pd
+from langchain.llms import VertexAI
 
 #from config import set_environment
 from prompts import PROMPT
@@ -17,7 +18,7 @@ def create_agent(csv_file: str) -> AgentExecutor:
     Returns:
         An agent executor.
     """
-    llm = OpenAI()
+    llm = VertexAI()
     df = pd.read_csv(csv_file)
     return create_pandas_dataframe_agent(llm, df, verbose=True)
 

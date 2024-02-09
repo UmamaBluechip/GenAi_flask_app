@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Document Chat</title>
+    </head>
+<body>
+    <h1>Document Chat</h1>
+
+    <form method="POST" id="upload-form">
+        {% if session.get('configuration') is not None %}
+            <script>document.getElementById('upload-form').style.display = 'none';</script>
+        {% endif %}
+        <label for="files">Upload Documents:</label>
+        <input type="file" id="files" name="files" accept=".pdf,.txt,.docx,.epub" multiple>
+        <label for="compression">Use Compression:</label>
+        <input type="checkbox" id="compression" name="compression">
+        <label for="flare">Use FlareChain:</label>
+        <input type="checkbox" id="flare" name="flare">
+        <label for="moderation">Use Moderation:</label>
+        <input type="checkbox" id="moderation" name="moderation">
+        <button type="submit">Start Chat</button>
+    </form>
+
+    <h2>Chat History</h2>
+    <ul id="chat-history">
+        </ul>
+
+    <h2>Chat Input</h2>
+    <form method="POST" id="chat-form">
+        <input type="text" id="user-query" name="user_query" placeholder="Enter your question">
+        <button type="submit">Send</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+        // Handle form submissions and AJAX requests to update chat history and response
+        const chatHistory = document.getElementById('chat-history');
+        const userQueryInput = document.getElementById('user-query');
+        const responseDiv = document.getElementById('response');
+
+        // Function to add a message to the chat history
+        function addMessage(type, content) {
+            const messageLi = document.createElement('li');
+            messageLi.textContent = type + ': ' + content;
+            chatHistory.appendChild(messageLi);
+        }
+
+        // Handle form submission for chat interaction
+        document.getElementById('chat-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const userQuery = userQueryInput.value;
+            userQueryInput.value = ''; // Clear input field
+
+            // Make an AJAX request to your Flask route with user query
+            fetch('/document_chat', {
+                method: 'POST',
+                body: JSON.stringify({ user_query: userQuery })
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessage('human', userQuery);
+                addMessage('ai', data.response);
+                responseDiv.textContent = data.response; // Optionally update response div directly
+            });
+        });
+
+        // ... (add more JavaScript logic for other interactions or UI updates)
+    </script>
+</body>
+</html>

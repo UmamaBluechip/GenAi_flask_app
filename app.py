@@ -2,15 +2,14 @@ from fastapi.responses import RedirectResponse
 from flask import Flask, request, render_template, session
 from langchain.callbacks import CallbackHandler
 from langchain.memory import ConversationBufferMemory
-from functions.excel_chat import agent, prompts
 from functions.document_chat import doc_chat, utils
-from functions.question_answer import agent, utils
 from functions.summarizer import summarize, prompts
 from functions.info_extraction import extraction
+from functions.question_answer import qa_agent
+from functions.excel_chat import excel_agent
 from flask_wtf import FlaskForm
 from wtforms import FileField, SelectField, BooleanField, SubmitField
 from werkzeug.utils import secure_filename
-
 
 app = Flask(__name__)
 
@@ -21,7 +20,7 @@ def qa():
         strategy = session.get("strategy")
         tool_names = session.get("tool_names")
 
-        agent_chain = agent.load_agent(tool_names=tool_names, strategy=strategy)
+        agent_chain = qa_agent.load_agent(tool_names=tool_names, strategy=strategy)
         stream_handler = CallbackHandler()
         with stream_handler:
             response = agent_chain.run({
@@ -50,20 +49,14 @@ def document_chat():
     configuration = session.get('configuration', {}) 
 
     if form.validate_on_submit():
-        # Handle file uploads, configuration options, and chain setup
         uploaded_files = form.files.data
-        # ... (logic adapted from configure_retrieval_chain)
         configuration = {
-            # ... store relevant configuration options
         }
         session['configuration'] = configuration
-        # ... (chain initialization using your custom function)
         return redirect(url_for('.document_chat'))
 
     if request.method == 'POST':
-        # Handle user input and generate response
         user_query = request.form.get('user_query')
-        # ... (use configuration and chain to run CONV_CHAIN.run)
         response = ...
         chat_history.append({
             'type': 'human',
@@ -75,7 +68,29 @@ def document_chat():
         })
         session['chat_history'] = chat_history
 
-    return render_template('chat.html', form=form, chat_history=chat_history)
+    return render_template('doc_chat.html', form=form, chat_history=chat_history)
+
+
+@app.route('/data_chat', methods=['GET', 'POST'])
+def data_chat():
+    if request.method == 'GET':
+        return render_template('data_chat.html')
+
+    elif request.method == 'POST':
+
+        # Assuming 'data_file' and 'query' are provided by the HTML form
+        data_file = request.files['data_file']
+        query = request.form['query']
+
+        # Handling file upload
+        if data_file and data_file.filename.endswith('.csv'):
+            agent = excel_agent.create_agent(data_file.read().decode())
+            response = excel_agent.query_agent(agent=agent, query=query)
+            return render_template('data_chat.html', response=response)
+
+        else:
+            error_message = "Please upload a valid CSV file."
+            return render_template('data_chat.html', error_message=error_message)
 
 
 
