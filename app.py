@@ -105,7 +105,7 @@ def extract_resume_info():
 
     if resume_file and resume_file.filename.endswith('.pdf'):
         resume_info = extraction.parse_cv(resume_file)
-        return render_template('result.html', resume_info=resume_info)
+        return render_template('extraction_result.html', resume_info=resume_info)
 
     return "Invalid file format. Please upload a PDF file."
 
