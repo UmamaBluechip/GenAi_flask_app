@@ -19,7 +19,6 @@ wolframalpha>=5.0.0
 unstructured>=0.8.1
 pandoc>=1.1.0  # needs system install as well!
 sentence-transformers>=2.2.2
-gradio>=3.38.0
 gpt4all>=1.0.6
 google-api-python-client>=2.94.0
 apify-client>=1.4.0
@@ -31,3 +30,4 @@ promptwatch>=0.2.9
 langchain_decorators>=0.2.3
 Flask-WTF
 WTForms
+googlesearch-python

@@ -1,4 +1,3 @@
-from fastapi.responses import RedirectResponse
 from flask import Flask, redirect, request, render_template, session, jsonify, url_for
 from langchain.chat_models import ChatVertexAI
 from langchain.schema import SystemMessage, HumanMessage
@@ -13,6 +12,7 @@ from flask_wtf import FlaskForm
 from wtforms import FileField, SelectField, BooleanField, SubmitField
 from werkzeug.utils import secure_filename
 
+
 app = Flask(__name__)
 
 @app.route("/qa", methods=["GET", "POST"])
@@ -20,15 +20,11 @@ def question_answerer():
     if request.method == "GET":
         return render_template("qa.html")
     elif request.method == "POST":
-
         prompt = request.form["prompt"]
         strategy = request.form["strategy"]
         tools = request.form.getlist("tools")
-
         agent = qa_agent.load_agent(tools, strategy)
-
         response = agent.run(prompt)
-
         return render_template("qa.html", prompt=prompt, response=response)
 
 
