@@ -4,17 +4,13 @@ import tempfile
 from flask import Flask, redirect, request, render_template, session, jsonify, url_for
 from langchain.chat_models import ChatVertexAI
 from langchain.schema import SystemMessage, HumanMessage
-from langchain.callbacks import CallbackHandler
 from langchain.memory import ConversationBufferMemory
-from functions.document_chat import doc_chat, utils
+from functions.document_chat import doc_chat, doc_utils
 from functions.summarizer import summarize, prompts
 from functions.info_extraction import extraction
 from functions.question_answer import qa_agent
 from functions.excel_chat import excel_agent
-from flask_wtf import FlaskForm
-from wtforms import FileField, SelectField, BooleanField, SubmitField
 from werkzeug.utils import secure_filename
-from functions.document_chat.utils import MEMORY, DocumentLoader
 
 
 app = Flask(__name__)
@@ -35,6 +31,7 @@ def question_answerer():
         agent = qa_agent.load_agent(tools, strategy)
         response = agent.run(prompt)
         return render_template("qa.html", prompt=prompt, response=response)
+
 
 
 logging.basicConfig(encoding="utf-8", level=logging.INFO)
@@ -129,6 +126,7 @@ def extract_resume_info():
     return "Invalid file format. Please upload a PDF file."
 
 
+
 LLM = ChatVertexAI(model_name="chat-bison", temperature=0)
 
 @app.route('/writing_assistant', methods=['POST'])
@@ -156,6 +154,7 @@ def writing_assistant():
     output = LLM(messages, temperature=temperature).content
 
     return render_template("writing_assistant.html", output=output)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
