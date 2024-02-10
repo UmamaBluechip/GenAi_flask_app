@@ -1,3 +1,4 @@
+import logging
 import os
 import tempfile
 from flask import Flask, redirect, request, render_template, session, jsonify, url_for
@@ -18,6 +19,11 @@ from functions.document_chat.utils import MEMORY, DocumentLoader
 
 app = Flask(__name__)
 
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
 @app.route("/qa", methods=["GET", "POST"])
 def question_answerer():
     if request.method == "GET":
@@ -31,12 +37,8 @@ def question_answerer():
         return render_template("qa.html", prompt=prompt, response=response)
 
 
-class ChatForm(FlaskForm):
-    files = FileField('Upload Documents', accept_multiple=True)
-    compression = BooleanField('Use Compression')
-    flare = BooleanField('Use FlareChain')
-    moderation = BooleanField('Use Moderation')
-    submit = SubmitField('Start Chat')
+logging.basicConfig(encoding="utf-8", level=logging.INFO)
+LOGGER = logging.getLogger()
 
 @app.route('/document_chat', methods=['GET', 'POST'])
 def document_chat():
@@ -153,7 +155,7 @@ def writing_assistant():
     ]
     output = LLM(messages, temperature=temperature).content
 
-    return jsonify({'feedback': output})
+    return render_template("writing_assistant.html", output=output)
 
 if __name__ == "__main__":
     app.run(debug=True)
