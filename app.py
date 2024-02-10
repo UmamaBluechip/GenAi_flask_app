@@ -1,5 +1,7 @@
 from fastapi.responses import RedirectResponse
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template, session, jsonify
+from langchain.chat_models import ChatVertexAI
+from langchain.schema import SystemMessage, HumanMessage
 from langchain.callbacks import CallbackHandler
 from langchain.memory import ConversationBufferMemory
 from functions.document_chat import doc_chat, utils
@@ -13,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/qa", methods=["GET", "POST"])
 def qa():
     if request.method == "POST":
         prompt = request.form["prompt"]
@@ -78,11 +80,9 @@ def data_chat():
 
     elif request.method == 'POST':
 
-        # Assuming 'data_file' and 'query' are provided by the HTML form
         data_file = request.files['data_file']
         query = request.form['query']
 
-        # Handling file upload
         if data_file and data_file.filename.endswith('.csv'):
             agent = excel_agent.create_agent(data_file.read().decode())
             response = excel_agent.query_agent(agent=agent, query=query)
@@ -109,6 +109,34 @@ def extract_resume_info():
 
     return "Invalid file format. Please upload a PDF file."
 
+
+LLM = ChatVertexAI(model_name="chat-bison", temperature=0)
+
+@app.route('/writing_assistant', methods=['POST'])
+def writing_assistant():
+
+    MISSION = "You are a helpful assistant that can fix and improve writing in terms of" \
+          " style, punctuation, grammar, vocabulary, and orthography so that it looks like something" \
+          " that a native speaker would write."
+
+    PREFIX = "Give feedback on incorrect spelling, grammar, and expressions of the text" \
+         " below. Check the tense consistency. Explain grammar rules and examples for" \
+         " grammar rules. Give hints so the text becomes more concise and engrossing.\n" \
+         "Text: {text}." \
+         "" \
+         "Feedback: "
+
+    data = request.get_json()
+    input_text = data.get('text')
+    temperature = data.get('temperature', 0.0)
+
+    messages = [
+        SystemMessage(content=MISSION),
+        HumanMessage(content=PREFIX.format(text=input_text))
+    ]
+    output = LLM(messages, temperature=temperature).content
+
+    return jsonify({'feedback': output})
 
 if __name__ == "__main__":
     app.run(debug=True)
