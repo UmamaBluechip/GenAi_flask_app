@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Answering</title>
+    <link rel="stylesheet" href="style.css">  </head>
+<body>
+    <h1>Ask Your Question:</h1>
+    <form method="POST">
+        <label for="prompt">Your question:</label>
+        <textarea name="prompt" id="prompt" required></textarea>
+        <br>
+        <label for="strategy">Reasoning Strategy:</label>
+        <select name="strategy" id="strategy">
+            <option value="plan-and-solve">Plan and Solve</option>
+            <option value="zero-shot-react">Zero-Shot React</option>
+        </select>
+        <br>
+        <label for="tools">Select Tools:</label>
+        <br>
+        <input type="checkbox" name="tools" id="google-search" value="google-search">
+        <label for="google-search">google search</label>
+        <br>
+        <input type="checkbox" name="tools" id="ddg-search" value="ddg-search">
+        <label for="ddg-search">ddg search</label>
+        <br>
+        <input type="checkbox" name="tools" id="wolfram-alpha" value="wolfram-alpha">
+        <label for="wolfram-alpha">wolfram alpha</label>
+        <br>
+        <br>
+        <input type="submit" value="Ask">
+    </form>
+    <br>
+
+    <h2>Answer:</h2>
+    <p id="answer">{{ response }}</p>
+
+    <script src="script.js"></script> </body>
+</html>
