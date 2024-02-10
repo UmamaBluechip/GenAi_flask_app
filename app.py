@@ -1,3 +1,5 @@
+import os
+import tempfile
 from flask import Flask, redirect, request, render_template, session, jsonify, url_for
 from langchain.chat_models import ChatVertexAI
 from langchain.schema import SystemMessage, HumanMessage
@@ -11,6 +13,7 @@ from functions.excel_chat import excel_agent
 from flask_wtf import FlaskForm
 from wtforms import FileField, SelectField, BooleanField, SubmitField
 from werkzeug.utils import secure_filename
+from functions.document_chat.utils import MEMORY, DocumentLoader
 
 
 app = Flask(__name__)
@@ -37,31 +40,54 @@ class ChatForm(FlaskForm):
 
 @app.route('/document_chat', methods=['GET', 'POST'])
 def document_chat():
-    form = ChatForm()
-    chat_history = session.get('chat_history', []) 
-    configuration = session.get('configuration', {}) 
 
-    if form.validate_on_submit():
-        uploaded_files = form.files.data
-        configuration = {
-        }
-        session['configuration'] = configuration
-        return redirect(url_for('.document_chat'))
+    uploaded_files = []
+    use_compression = False
+    use_flare = False
+    use_moderation = False
+    error = None
+    chat_history = session.get('chat_history', [])
+
+    if request.method == 'GET':
+        return render_template('doc_chat.html', uploaded_files=[], chat_history=chat_history)
 
     if request.method == 'POST':
-        user_query = request.form.get('user_query')
-        response = ...
-        chat_history.append({
-            'type': 'human',
-            'content': user_query
-        })
-        chat_history.append({
-            'type': 'ai',
-            'content': response
-        })
-        session['chat_history'] = chat_history
+        if 'files' in request.files:
+            for file in request.files.getlist('files'):
+                filename = secure_filename(file.filename)
+                temp_filepath = os.path.join(tempfile.gettempdir(), filename)
+                file.save(temp_filepath)
+                uploaded_files.append(temp_filepath)
 
-    return render_template('doc_chat.html', form=form, chat_history=chat_history)
+        use_compression = request.form.get('compression', False) == 'on'
+        use_flare = request.form.get('flare', False) == 'on'
+        use_moderation = request.form.get('moderation', False) == 'on'
+        user_query = request.form.get('user_query')
+
+        if not user_query or not uploaded_files:
+            error = "Please upload documents and enter a query."
+            return render_template('doc_chat.html', uploaded_files=[], chat_history=chat_history, error=error)
+
+        CONV_CHAIN = doc_chat.configure_retrieval_chain(
+            uploaded_files, use_compression=use_compression, use_flare=use_flare, use_moderation=use_moderation
+        )
+
+        try:
+            response = CONV_CHAIN.run({'question': user_query, 'chat_history': chat_history})
+            chat_history.append({'type': 'user', 'content': user_query})
+            chat_history.append({'type': 'ai', 'content': response})
+            session['chat_history'] = chat_history
+        except Exception as e:
+            error = f"An error occurred: {e}"
+            return render_template('doc_chat.html', uploaded_files=[], chat_history=chat_history, error=error)
+
+        for file in uploaded_files:
+            os.remove(file)
+
+        return render_template('doc_chat.html', uploaded_files=uploaded_files, chat_history=chat_history, error=error)
+
+    return redirect(url_for('document_chat'))
+
 
 
 @app.route('/data_chat', methods=['GET', 'POST'])
