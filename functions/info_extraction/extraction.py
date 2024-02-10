@@ -1,7 +1,3 @@
-"""Information information_extraction from documents.
-
-The example CV is from https://github.com/xitanggg/open-resume.
-"""
 from typing import Optional
 
 from langchain.chains import create_extraction_chain_pydantic

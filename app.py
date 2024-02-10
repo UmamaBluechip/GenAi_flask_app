@@ -1,5 +1,5 @@
 from fastapi.responses import RedirectResponse
-from flask import Flask, request, render_template, session, jsonify
+from flask import Flask, redirect, request, render_template, session, jsonify, url_for
 from langchain.chat_models import ChatVertexAI
 from langchain.schema import SystemMessage, HumanMessage
 from langchain.callbacks import CallbackHandler
@@ -16,26 +16,21 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 
 @app.route("/qa", methods=["GET", "POST"])
-def qa():
-    if request.method == "POST":
-        prompt = request.form["prompt"]
-        strategy = session.get("strategy")
-        tool_names = session.get("tool_names")
-
-        agent_chain = qa_agent.load_agent(tool_names=tool_names, strategy=strategy)
-        stream_handler = CallbackHandler()
-        with stream_handler:
-            response = agent_chain.run({
-                "input": prompt,
-            }, callbacks=[stream_handler])
-
-        return render_template("chat.html", response=response["output"])
-
-    else:
-        session["strategy"] = "zero-shot-react"
-        session["tool_names"] = ["ddg-search", "wolfram-alpha", "wikipedia"]
+def question_answerer():
+    if request.method == "GET":
         return render_template("qa.html")
-    
+    elif request.method == "POST":
+
+        prompt = request.form["prompt"]
+        strategy = request.form["strategy"]
+        tools = request.form.getlist("tools")
+
+        agent = qa_agent.load_agent(tools, strategy)
+
+        response = agent.run(prompt)
+
+        return render_template("qa.html", prompt=prompt, response=response)
+
 
 class ChatForm(FlaskForm):
     files = FileField('Upload Documents', accept_multiple=True)
