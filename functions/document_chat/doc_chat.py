@@ -18,7 +18,7 @@ from langchain.retrievers.document_compressors import EmbeddingsFilter
 from langchain.schema import BaseRetriever, Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import DocArrayInMemorySearch
-from doc_utils import MEMORY, load_document
+from functions.document_chat.utils.doc_utils import MEMORY, load_document
 
 
 logging.basicConfig(encoding="utf-8", level=logging.INFO)

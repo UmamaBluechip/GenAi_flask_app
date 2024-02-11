@@ -5,8 +5,8 @@ from flask import Flask, redirect, request, render_template, session, jsonify, u
 from langchain import HuggingFaceHub
 from langchain.schema import SystemMessage, HumanMessage
 from langchain.memory import ConversationBufferMemory
-from functions.document_chat import doc_chat, doc_utils
-from functions.summarizer import summarize, prompts
+from functions.document_chat import doc_chat
+from functions.document_chat.utils import doc_utils
 from functions.info_extraction import extraction
 from functions.question_answer import qa_agent
 from functions.excel_chat import excel_agent

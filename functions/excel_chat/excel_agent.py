@@ -5,7 +5,7 @@ import pandas as pd
 from langchain.llms import VertexAI
 
 #from config import set_environment
-from prompts import PROMPT
+from functions.excel_chat.prompts.prompts import PROMPT
 
 
 def create_agent(csv_file: str) -> AgentExecutor:
