@@ -18,7 +18,7 @@ def create_agent(csv_file: str) -> AgentExecutor:
     Returns:
         An agent executor.
     """
-    llm  = HuggingFaceHub(repo_id="openai-community/gpt2", huggingfacehub_api_token="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")
+    llm  = HuggingFaceHub(repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1", huggingfacehub_api_token="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")
 
     df = pd.read_csv(csv_file)
     return create_pandas_dataframe_agent(llm, df, verbose=True)
