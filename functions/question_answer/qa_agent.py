@@ -16,7 +16,7 @@ def load_agent(
 ) -> Chain:
     #llm = ChatVertexAI(temperature=0)
 
-    llm  = HuggingFaceHub(repo_id="deepset/roberta-base-squad2", huggingfacehub_api_token="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")
+    llm  = HuggingFaceHub(repo_id="openai-community/gpt2", huggingfacehub_api_token="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")
     tools = load_tools(
         tool_names=tool_names,
         llm=llm
