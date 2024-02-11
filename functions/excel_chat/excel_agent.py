@@ -1,5 +1,5 @@
 """Agent functionality."""
-from langchain import OpenAI, PromptTemplate
+from langchain import HuggingFaceHub, OpenAI, PromptTemplate
 from langchain.agents import create_pandas_dataframe_agent, AgentExecutor
 import pandas as pd
 from langchain.llms import VertexAI
@@ -18,7 +18,8 @@ def create_agent(csv_file: str) -> AgentExecutor:
     Returns:
         An agent executor.
     """
-    llm = VertexAI()
+    llm  = HuggingFaceHub(repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1", huggingfacehub_api_token="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")
+
     df = pd.read_csv(csv_file)
     return create_pandas_dataframe_agent(llm, df, verbose=True)
 

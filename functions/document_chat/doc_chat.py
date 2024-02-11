@@ -2,6 +2,7 @@
 import logging
 import os
 import tempfile
+from langchain import HuggingFaceHub
 
 from langchain.chains import (
     ConversationalRetrievalChain,
@@ -24,7 +25,8 @@ logging.basicConfig(encoding="utf-8", level=logging.INFO)
 LOGGER = logging.getLogger()
 
 # Setup LLM and QA chain; set temperature low to keep hallucinations in check
-LLM = ChatVertexAI()
+LLM = HuggingFaceHub(repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1", huggingfacehub_api_token="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")
+
 
 def configure_retriever(
         docs: list[Document],

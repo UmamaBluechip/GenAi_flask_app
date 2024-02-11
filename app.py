@@ -2,6 +2,7 @@ import logging
 import os
 import tempfile
 from flask import Flask, redirect, request, render_template, session, jsonify, url_for
+from langchain import HuggingFaceHub
 from langchain.chat_models import ChatVertexAI
 from langchain.schema import SystemMessage, HumanMessage
 from langchain.memory import ConversationBufferMemory
@@ -127,7 +128,7 @@ def extract_resume_info():
 
 
 
-LLM = ChatVertexAI(model_name="chat-bison", temperature=0)
+LLM  = HuggingFaceHub(repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1", huggingfacehub_api_token="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")
 
 @app.route('/writing_assistant', methods=['POST'])
 def writing_assistant():

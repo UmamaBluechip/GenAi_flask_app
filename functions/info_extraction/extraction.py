@@ -1,7 +1,8 @@
 from typing import Optional
 
 from langchain.chains import create_extraction_chain_pydantic
-from langchain.chat_models import ChatOpenAI, ChatVertexAI
+from langchain.chat_models import ChatOpenAI, ChatVertexAI, ChatAnthropic
+from langchain.llms import HuggingFaceHub
 from langchain.document_loaders import PyPDFLoader
 from pydantic import BaseModel, Field
 
@@ -57,12 +58,13 @@ def parse_cv(pdf_file_path: str) -> str:
     pdf_loader = PyPDFLoader(pdf_file_path)
     docs = pdf_loader.load_and_split()
     # please note that function calling is not enabled for all models!
-    llm = ChatVertexAI()
+    #llm = ChatVertexAI(model_name="chat-bison@002")
+    llm = HuggingFaceHub(repo_id="openai-community/gpt2", huggingfacehub_api_token="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")
     chain = create_extraction_chain_pydantic(pydantic_schema=Resume, llm=llm)
     return chain.run(docs)
 
 
 if __name__ == "__main__":
     print(parse_cv(
-        pdf_file_path="openresume-resume.pdf"
+        pdf_file_path="functions\info_extraction\openresume-resume.pdf"
     ))

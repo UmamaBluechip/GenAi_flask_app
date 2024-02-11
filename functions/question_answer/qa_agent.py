@@ -3,6 +3,7 @@ from typing import Literal
 from langchain.agents import initialize_agent, load_tools, AgentType
 from langchain.chains.base import Chain
 from langchain.chat_models import ChatOpenAI, ChatVertexAI
+from langchain.llms import HuggingFacePipeline, HuggingFaceHub
 from langchain_experimental.plan_and_execute import (
     load_chat_planner, load_agent_executor, PlanAndExecute
 )
@@ -13,7 +14,9 @@ def load_agent(
         tool_names: list[str],
         strategy: ReasoningStrategies = "zero-shot-react"
 ) -> Chain:
-    llm = ChatVertexAI(temperature=0)
+    #llm = ChatVertexAI(temperature=0)
+
+    llm  = HuggingFaceHub(repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1", huggingfacehub_api_token="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")
     tools = load_tools(
         tool_names=tool_names,
         llm=llm
