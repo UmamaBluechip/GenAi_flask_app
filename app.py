@@ -3,7 +3,6 @@ import os
 import tempfile
 from flask import Flask, redirect, request, render_template, session, jsonify, url_for
 from langchain import HuggingFaceHub
-from langchain.chat_models import ChatVertexAI
 from langchain.schema import SystemMessage, HumanMessage
 from langchain.memory import ConversationBufferMemory
 from functions.document_chat import doc_chat, doc_utils
