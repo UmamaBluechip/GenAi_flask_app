@@ -127,33 +127,45 @@ def extract_resume_info():
 
 
 
-LLM  = HuggingFaceHub(repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1", huggingfacehub_api_token="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")
+LLM  = HuggingFaceHub(repo_id="TinyLlama/TinyLlama-1.1B-Chat-v1.0", huggingfacehub_api_token="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")
 
-@app.route('/writing_assistant', methods=['POST'])
+@app.route('/writing_assistant', methods=['GET', 'POST'])
 def writing_assistant():
 
     MISSION = "You are a helpful assistant that can fix and improve writing in terms of" \
-          " style, punctuation, grammar, vocabulary, and orthography so that it looks like something" \
-          " that a native speaker would write."
+        " style, punctuation, grammar, vocabulary, and orthography so that it looks like something" \
+        " that a native speaker would write."
 
     PREFIX = "Give feedback on incorrect spelling, grammar, and expressions of the text" \
-         " below. Check the tense consistency. Explain grammar rules and examples for" \
-         " grammar rules. Give hints so the text becomes more concise and engrossing.\n" \
-         "Text: {text}." \
-         "" \
-         "Feedback: "
+        " below. Check the tense consistency. Explain grammar rules and examples for" \
+        " grammar rules. Give hints so the text becomes more concise and engrossing.\n" \
+        "Text: {text}." \
+        "" \
+        "Feedback: "
 
-    data = request.get_json()
-    input_text = data.get('text')
-    temperature = data.get('temperature', 0.0)
+    if request.method == 'POST':
+        input_text = request.form.get('text', '')
+        if not input_text:
+            return render_template("writing_assistant.html", error="Please enter some text to analyze.")
 
-    messages = [
-        SystemMessage(content=MISSION),
-        HumanMessage(content=PREFIX.format(text=input_text))
-    ]
-    output = LLM(messages, temperature=temperature).content
+        temperature = request.form.get('temperature', 0.0)
 
-    return render_template("writing_assistant.html", output=output)
+        messages = [
+            SystemMessage(content=MISSION),
+            HumanMessage(content=PREFIX.format(text=input_text))
+        ]
+
+        message = HumanMessage(content=PREFIX.format(text=input_text))
+        prompt_text = message.content
+
+        
+        output = LLM(prompt_text, temperature=temperature).content
+
+        return render_template("writing_assistant.html", output=output)
+
+    return render_template("writing_assistant.html", mission=MISSION)
+
+
 
 
 if __name__ == "__main__":

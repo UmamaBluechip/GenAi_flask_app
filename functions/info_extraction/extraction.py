@@ -62,9 +62,3 @@ def parse_cv(pdf_file_path: str) -> str:
     llm = HuggingFaceHub(repo_id="openai-community/gpt2", huggingfacehub_api_token="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")
     chain = create_extraction_chain_pydantic(pydantic_schema=Resume, llm=llm)
     return chain.run(docs)
-
-
-if __name__ == "__main__":
-    print(parse_cv(
-        pdf_file_path="functions\info_extraction\openresume-resume.pdf"
-    ))
